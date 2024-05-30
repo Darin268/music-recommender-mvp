@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Recommender</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        h1 {
+            text-align: center;
+        }
+        form {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #recommendations {
+            margin-top: 20px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Music Recommender</h1>
+    <form id="recommend-form">
+        <label for="liked_song_id">Liked Song ID:</label>
+        <input type="text" id="liked_song_id" name="liked_song_id" required>
+        <label for="song_ids">Song IDs (comma separated):</label>
+        <input type="text" id="song_ids" name="song_ids" required>
+        <button type="submit">Get Recommendations</button>
+    </form>
+    <div id="recommendations"></div>
+    <script>
+        document.getElementById('recommend-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const liked_song_id = document.getElementById('liked_song_id').value;
+            const song_ids = document.getElementById('song_ids').value.split(',').map(id => id.trim());
+
+            fetch('/recommend', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ liked_song_id, song_ids }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                const recommendations = data.recommended_songs.map(song_id => `<li>${song_id}</li>`).join('');
+                document.getElementById('recommendations').innerHTML = `<ul>${recommendations}</ul>`;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,13 +1,11 @@
+import os
 import spotipy
-from spotipy.oauth2 import SpotifyClientCredentials
+from spotipy.oauth2 import SpotifyClientCredentials, SpotifyOAuth
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics.pairwise import cosine_similarity
 import pandas as pd
 
-def fetch_song_features(song_ids):
-    client_id = app.config['SPOTIPY_CLIENT_ID']
-    client_secret = app.config['SPOTIPY_CLIENT_SECRET']
-
+def fetch_song_features(song_ids, client_id, client_secret):
     sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=client_id, client_secret=client_secret))
 
     features = []
@@ -30,3 +28,12 @@ def recommend_songs(liked_song_id, features_df, numerical_features, top_n=10):
     sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
     top_songs = [features_df.iloc[i[0]]['id'] for i in sim_scores[1:top_n+1]]
     return top_songs
+
+# Example usage of SpotifyOAuth if needed
+def create_spotify_oauth():
+    return SpotifyOAuth(
+        client_id=os.getenv('SPOTIPY_CLIENT_ID'),
+        client_secret=os.getenv('SPOTIPY_CLIENT_SECRET'),
+        redirect_uri=os.getenv('SPOTIPY_REDIRECT_URI'),
+        scope="user-library-read"
+    )
